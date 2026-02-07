@@ -1,0 +1,9 @@
+{
+  "spec": {
+    "name": "OpenShelf",
+    "version": "0.1.0-draft"
+  },
+  "capabilities": [
+    "location"
+  ]
+}

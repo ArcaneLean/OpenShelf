@@ -134,15 +134,12 @@ The behavioral interpretation, merging, and prioritization of location represent
 
 Declared capabilities describe the features supported by the library format itself, not by any specific reader or adapter.
 
-The library **MUST** declare supported capabilities in `library.json`.
-
-Example:
-
+The library **MUST** declare supported capabilities in `library.json`:
 ```json
 {
   "spec": {
-    "name": "ReadingLibrary",
-    "version": "0.1.0"
+    "name": "OpenShelf",
+    "version": "0.1.0-draft"
   },
   "capabilities": [
     "location-percentage",
