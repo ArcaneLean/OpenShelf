@@ -1,9 +1,6 @@
 # OpenShelf Specification
 
-## Version: 0.1.0-draft (Frozen)
-
-This version is feature-complete and stable for implementation.
-Future changes will be introduced in v0.2.0 or later.
+## Version: 0.2.0-draft (WIP)
 
 ---
 
@@ -20,18 +17,29 @@ A compliant library **MUST** follow this structure:
 
 ### Rules
 
-* All book files **MUST** be stored under `/books/`
-* Reading state files **MUST** be stored under `/.state/`
-* Directories whose names start with `.` are **implementation-owned**
-* Implementations **MUST NOT** require users to manually edit dot-prefixed directories
+* **Book files**:
+  Adapters **MAY** read book files from any location on the device.
+  The `/books/` directory is optional, provided for implementations that want a central location for all books.
+
+* **Reading state files**:
+  Reading state files **MUST** be stored under `/.state/`.
+  All adapters **MUST** read and write state files from this location to ensure interoperability.
+
+* **Dot-prefixed directories**:
+  Directories whose names start with `.` are **implementation-owned**.
+  Implementations **MUST NOT** require users to manually edit dot-prefixed directories.
+
+* **Optional directories**:
+  Implementations **MAY** create additional directories as needed, provided they do not conflict with the mandated structure.
 
 ---
 
 ## 2. Book Placement
 
-* The directory structure under `/books/` is **user-defined**
-* Implementations **MUST NOT** derive meaning from folder names
-* Book identity is independent of file path or filename
+* The directory structure under `/books/` is **user-defined**.
+* Implementations **MUST NOT** derive meaning from folder names.
+* Book identity is independent of file path or filename.
+* Not all books need to be stored in `/books/`; adapters may access book files from any location on the device.
 
 This allows users to organize their library freely.
 
@@ -44,87 +52,105 @@ Each book is identified by the hash of its file contents.
 ### Rules
 
 * Book ID **MUST** be computed as:
-
   ```
   sha256(file_bytes)
   ```
-* The Book ID **MUST NOT** depend on:
 
+* The Book ID **MUST NOT** depend on:
   * filename
   * file path
   * metadata
+
 * Book IDs **MUST** be treated as immutable
 
 ---
 
-## 4. Reading State Filesystem
+## 4. Reading State Files
 
-### Storage
+* Each book may have **at most one** reading state file.
+* Each reading state file **MUST** correspond to a single book.
+* The filename **MUST** be the book's unique Book ID with a `.json` extension.
+* The Book ID **MUST** be encoded in a filesystem-safe form.
 
-* Each book may have **at most one** reading state file
-* Reading state files **MUST** be stored in `/.state/`
+**Example:**
 
-### Naming
-
-The `<bookId>` used in filenames MUST be encoded in a filesystem-safe form.
-For SHA-256 book IDs, the colon (`:`) MUST be replaced with an underscore (`_`).
-
+If a book has Book ID:
 ```
-/.state/<bookId>.json
+abc123
 ```
 
-Example:
-
+then its reading state file **MUST** be:
 ```
-/.state/sha256_abc123.json
+/OpenShelf/.state/abc123.json
 ```
 
 ---
 
-## 5. Reading State Schema (v0.1)
+## 5. Reading State Schema
 
-A reading state file **MUST** contain:
+A reading state file **MUST** be a JSON object containing at least the required fields listed below. The following is a representative example of a fully populated state file:
 
 ```json
 {
-  "specVersion": "0.1.0",
-  "bookId": "sha256_abc123",
-  "updatedAt": "2026-02-03T10:15:00Z",
+  "specVersion": "0.2.0-draft",
+  "bookId": "abc123",
+  "updatedAt": "2026-01-25T10:15:00Z",
   "location": {
-    "percentage": 42.3,
-    "epubcfi": "/6/2[chapter1]!/4/2/14",
-    "page": 123
+    "percentage": {
+      "value": 42.3,
+      "updatedAt": "2026-01-25T10:15:00Z"
+    },
+    "epubcfi": {
+      "value": "/6/2[chapter1]!/4/2/14",
+      "updatedAt": "2026-01-25T10:15:00Z"
+    },
+    "page": {
+      "value": 123,
+      "updatedAt": "2026-01-25T10:15:00Z"
+    }
   }
 }
 ```
 
-### Required fields
+### Required top-level fields
 
-* `specVersion`
-* `bookId`
-* `updatedAt`
-* `location`
+* `specVersion` — The version of the OpenShelf spec this state file conforms to.
+* `bookId` — The SHA-256 hash of the book’s contents (Book ID).
+* `updatedAt` — ISO 8601 UTC timestamp representing the last update to the reading state file.
+* `location` — Object containing all known location representations for the book (may be empty if no locations are recorded).
+
+### Location fields
+
+* Each location (`percentage`, `epubcfi`, `page`, etc.) **MUST** be an object containing:
+
+  * `value` — The location value (number for percentage/page, string for epubcfi).
+  * `updatedAt` — ISO 8601 UTC timestamp representing the last update to this specific location.
 
 ### Optional fields
 
-* `location.percentage`
-* `location.epubcfi`
-* `location.page`
+* Any location representation may be omitted if the adapter does not support it.
+* Implementations **MUST ignore unknown fields**.
 
-Implementations **MUST ignore unknown fields**.
-Timestamps **MUST** be ISO 8601 UTC strings (e.g., `2026-02-03T10:15:00Z`).
+### Notes
+
+* Timestamps **MUST** be ISO 8601 UTC strings (e.g., `"2026-01-25T10:15:00Z"`).
+* The top-level `updatedAt` **MUST** be updated whenever any location in the file changes.
 
 ---
 
 ## 6. Location Model
 
-The `location` object represents the reader’s last known position in the book using one or more location representations.
+The `location` object represents the reader’s last known position in the book, using zero or more location representations.
 
 Each field within the `location` object represents a distinct location representation. Implementations MAY provide multiple representations simultaneously.
 
-* At least one location representation MUST be present
-* Implementations MUST NOT assume all fields are present
-* Percentage is RECOMMENDED as the universal fallback
+* A **location representation** is a specific way of expressing a position in the book, such as:
+  * `percentage` – the percentage of the book completed (0–100)
+  * `page` – a linear page number within the book
+  * `epubcfi` – a precise EPUB CFI (Canonical Fragment Identifier) path
+* Zero or more location representations MAY be present.
+* Implementations MUST handle missing fields gracefully.
+* Percentage is RECOMMENDED as a universal fallback if no other location is available.
 
 The behavioral interpretation, merging, and prioritization of location representations is defined in Section 10.
 
