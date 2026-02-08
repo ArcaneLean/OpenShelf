@@ -4,6 +4,7 @@ local utils = require("utils")
 local hash = require("hash")
 local library = require("library")
 local meta = require("_meta")
+local Event = require("ui/event")
 
 local OpenShelf = WidgetContainer:extend{
     name = "openshelf",
@@ -36,7 +37,10 @@ function OpenShelf:onReaderReady(doc_settings)
 		utils.log("Found reading state for " .. filename)
 	else
 		utils.log("No reading state found for " .. filename)
+		return
 	end
+	
+	self.ui:handleEvent(Event:new("GotoPercent", reading_state.location.percentage))
 end
 
 function OpenShelf:onCloseDocument()
