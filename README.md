@@ -71,7 +71,7 @@ Key ideas:
 
 ## How It Works (High Level)
 
-1. **Books** live in `/books/`
+1. **Books** (optionally) live in `/books/`
    Users organize them however they like.
 
 2. **Reading state** lives in `/.state/`
@@ -91,13 +91,22 @@ Key ideas:
 
 ```json
 {
-  "specVersion": "0.1.0",
-  "bookId": "sha256_abc123",
+  "specVersion": "0.2.0-draft",
+  "bookId": "abc123",
   "updatedAt": "2026-02-03T10:15:00Z",
   "location": {
-    "percentage": 42.3,
-    "epubcfi": "/6/2[chapter1]!/4/2/14",
-    "page": 123
+    "percentage": {
+      "value": 42.3,
+      "updatedAt": "2026-01-25T10:15:00Z"
+    },
+    "epubcfi": {
+      "value": "/6/2[chapter1]!/4/2/14",
+      "updatedAt": "2026-01-25T10:15:00Z"
+    },
+    "page": {
+      "value": 123,
+      "updatedAt": "2026-01-25T10:15:00Z"
+    }
   }
 }
 ```
@@ -148,7 +157,7 @@ A server can exist *later* — but only as a consumer of the same filesystem for
 
 ## Current Status
 
-* 🧪 **Specification:** v0.1.0-draft
+* 🧪 **Specification:** v0.2.0-draft
 * 📄 **Core focus:** book identity + reading progress
 * 🚫 **Explicitly out of scope (for now):**
 

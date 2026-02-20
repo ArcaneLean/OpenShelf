@@ -165,12 +165,10 @@ The library **MUST** declare supported capabilities in `library.json`:
 {
   "spec": {
     "name": "OpenShelf",
-    "version": "0.1.0-draft"
+    "version": "0.2.0-draft"
   },
   "capabilities": [
-    "location-percentage",
-    "location-epubcfi",
-    "location-page"
+    "location"
   ]
 }
 ```
@@ -189,11 +187,10 @@ The library **MUST** declare supported capabilities in `library.json`:
 When multiple reading state updates conflict:
 
 * Implementations **MUST** select the state with the latest `updatedAt` timestamp
-* Timestamp comparison **MUST** use UTC
 
 ---
 
-## 9. Explicit Non-Goals (v0.1)
+## 9. Explicit Non-Goals
 
 This version does **not** define:
 
@@ -207,7 +204,7 @@ This version does **not** define:
 
 ---
 
-## 10. Neutral Reading State Model (Informative)
+## 10. Neutral Reading State Model
 
 This section defines the **conceptual, in-memory model** that implementations SHOULD use when reading, merging, and writing reading state files. It exists to ensure consistent behavior across adapters and readers, even when different location representations are used.
 
@@ -253,7 +250,7 @@ No location representation is authoritative.
 
 Implementations MUST assume that:
 
-* Some representations may be missing
+* Representations may be missing
 * Representations may be inconsistent with each other
 * Precision varies across readers and formats
 
@@ -335,7 +332,7 @@ To ensure compatibility:
 
 ---
 
-## 11. Adapters (Overview)
+## 11. Adapters
 
 An **OpenShelf adapter** is a component that integrates a reader, device, or application
 with an OpenShelf library.

@@ -1,6 +1,6 @@
 # OpenShelf Adapter Responsibility Levels
 
-## Version: 0.1.0-draft
+## Version: 0.2.0-draft
 ## Status: Normative Extension
 
 Adapters bridge a OpenShelf Library filesystem with a specific reader or device. Different adapters may support different levels of interaction depending on platform constraints, reader APIs, and implementation maturity.
@@ -49,9 +49,24 @@ A Level 1 adapter can **consume** reading state to resume reading, but does not 
 ### Responsibilities
 
 * Read `/.state/<bookId>.json`
-* Normalize reading state according to Section 10
+* Normalize reading state according to the Core Specification Section 10
 * Select an appropriate location representation
+* When multiple supported location representations are present, the adapter **SHOULD** select the most recently updated representation that it understands
 * Resume reading when possible
+
+### Interoperable Location Representations
+
+To promote cross-adapter interoperability, a Level 1 adapter **SHOULD** support and correctly interpret as many interoperable location representations as reasonably feasible.
+
+The following representation types are considered interoperable:
+
+* `percentage`
+* `epubcfi`
+* `page`
+
+Adapters **MAY** support additional reader-specific representations.
+
+Failure to support interoperable representations does not invalidate an adapter implementation, but may reduce cross-reader compatibility.
 
 ### Constraints
 
@@ -83,6 +98,22 @@ A Level 2 adapter can both **read and write** reading state, but only for basic 
 
 A meaningful progress change is implementation-defined, but SHOULD avoid
 frequent updates caused by pagination, layout changes, or minor position jitter.
+
+### Interoperable Location Representations
+
+To promote cross-adapter interoperability, a Level 2 adapter **SHOULD** write at least one interoperable location representation when feasible.
+
+The following representation types are considered interoperable:
+
+* `percentage`
+* `epubcfi`
+* `page`
+
+If an adapter maintains a reader-specific or proprietary location representation, it **MAY** include that representation in addition to interoperable representations.
+
+The absence of interoperable representations does not invalidate a reading state file, but may reduce cross-reader compatibility.
+
+Adapters **MUST** preserve all existing location representations when updating state.
 
 ### Constraints
 
