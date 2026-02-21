@@ -1,1 +1,19 @@
-{"location":{"page":1058,"epubcfi":"\/body\/DocFragment[6]\/body\/div\/p[67]\/a\/text().0","percentage":49.976381672178}}
+{
+  "specVersion": "0.2.0-draft",
+  "bookId": "dbcf4713630d59dfa781798fcfd85cfffd35c1f0dbf35c993456688d81449457",
+  "updatedAt": "2026-01-25T10:15:00Z",
+  "location": {
+    "percentage": {
+      "value": 42.3,
+      "updatedAt": "2026-01-25T10:15:00Z"
+    },
+    "epubcfi": {
+      "value": "/6/2[chapter1]!/4/2/14",
+      "updatedAt": "2026-01-25T10:15:00Z"
+    },
+    "page": {
+      "value": 123,
+      "updatedAt": "2026-01-25T10:15:00Z"
+    }
+  }
+}
