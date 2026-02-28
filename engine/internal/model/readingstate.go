@@ -1,17 +1,19 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
-var InteroperableLocationTypes = []string{
-	"percentage",
-	"epubcfi",
-	"pageNumber",
-	"timeSeconds",
+var interoperableLocationTypes = map[string]struct{}{
+	"percentage":  {},
+	"epubcfi":     {},
+	"pageNumber":  {},
+	"timeSeconds": {},
 }
 
 type Location struct {
-	Value     interface{} `json:"value"`
-	UpdatedAt time.Time   `json:"updatedAt"`
+	Value     any       `json:"value"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type ReadingState struct {
@@ -21,20 +23,23 @@ type ReadingState struct {
 	Locations   map[string]Location `json:"location"`
 }
 
-func (rs *ReadingState) MostRecentLocation() (locType string, loc *Location) {
-	var latest *Location
+func (rs *ReadingState) MostRecentLocation() (string, Location, bool) {
+	var latest Location
 	var latestType string
+	var found bool
+
 	for t, l := range rs.Locations {
-		if latest == nil || l.UpdatedAt.After(latest.UpdatedAt) {
-			copyLoc := l // avoid pointer to iteration variable
-			latest = &copyLoc
+		if !found || l.UpdatedAt.After(latest.UpdatedAt) {
+			latest = l
 			latestType = t
+			found = true
 		}
 	}
-	return latestType, latest
+
+	return latestType, latest, found
 }
 
-func (rs *ReadingState) SetLocation(locType string, value interface{}, t time.Time) {
+func (rs *ReadingState) SetLocation(locType string, value any, t time.Time) {
 	if rs.Locations == nil {
 		rs.Locations = make(map[string]Location)
 	}
@@ -46,10 +51,6 @@ func (rs *ReadingState) SetLocation(locType string, value interface{}, t time.Ti
 }
 
 func IsInteroperable(locType string) bool {
-	for _, t := range InteroperableLocationTypes {
-		if t == locType {
-			return true
-		}
-	}
-	return false
+	_, ok := interoperableLocationTypes[locType]
+	return ok
 }

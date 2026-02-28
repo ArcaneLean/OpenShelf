@@ -1,0 +1,19 @@
+{
+  "specVersion": "0.2.0-draft",
+  "bookId": "dbcf4713630d59dfa781798fcfd85cfffd35c1f0dbf35c993456688d81449457",
+  "updatedAt": "2026-02-25T16:24:24.148610796+01:00",
+  "location": {
+    "epubcfi": {
+      "value": "/6/2[chapter1]!/4/2/14",
+      "updatedAt": "2026-01-25T10:15:00Z"
+    },
+    "page": {
+      "value": 50,
+      "updatedAt": "2026-02-25T16:24:24.148610796+01:00"
+    },
+    "percentage": {
+      "value": 42.3,
+      "updatedAt": "2026-01-25T10:15:00Z"
+    }
+  }
+}
