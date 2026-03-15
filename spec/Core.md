@@ -1,145 +1,74 @@
-# OpenShelf Core Specification
-
-## Version: 0.2.0-draft
-
----
-
 ## 1. Overview
 
-OpenShelf is a filesystem-based specification for interoperable reading state storage.
-
-It defines:
-
-* A standard library directory structure
-* A content-addressed book identity model
-* A location for reading state files
-* Conflict resolution rules
-* A capability declaration mechanism
-
-OpenShelf does not define reader behavior, synchronization protocols, or server infrastructure.
-
-The OpenShelf Core Specification defines only the minimal interoperable requirements. Additional behavior is defined in separate normative extensions.
+* Filesystem-based specification defining interoperable reading state storage.
+* Introduces a **content-addressed book identity model**.
+* Core responsibilities: minimal interoperable requirements, conflict resolution, capability declaration.
+* Does **not** define reader behavior, sync protocols, or server infrastructure.
 
 ---
 
 ## 2. Terminology
 
+* Define key terms such as `bookId`, reading state, canonical metadata, mutable metadata, adapter, etc.
+
 ---
 
-## 3. Directory Structure
+## 3. Book Identity
 
-A compliant library follows this structure:
+* Short overview of the **book identity model**.
+* References the **Book Identity Specification** for derivation rules.
+* Explains that a `bookId` uniquely identifies a book and ties reading state and metadata.
+* Emphasizes stability: identical content → same `bookId`, changes to canonical identity → new `bookId`.
+
+---
+
+## 4. Directory Structure
+
+* Minimal filesystem layout:
 
 ```
 /OpenShelf/
   library.json
   /books/
   /.state/
+  /.canonical/
+  /.metadata/
 ```
 
-* Adapters **MAY** read book files from any location on the device. The `/books/` directory is optional, provided for implementations that want a central location for all books.
-* Reading state files **MUST** be stored under `/.state/`. All adapters **MUST** read and write state files from this location to ensure interoperability.
-* Directories whose names start with `.` are **implementation-owned**. Implementations **MUST NOT** require users to manually edit dot-prefixed directories.
-* Implementations **MAY** create additional directories as needed, provided they do not conflict with the mandated structure.
+* **/books/** — optional, central location for book files.
 
----
+* **/.state/** — required, reading state files.
 
-# 4. Book Identifiers
+* **/.canonical/** — immutable canonical metadata defining identity.
 
-## 4.1 Overview
+* **/.metadata/** — mutable, non-identity-defining metadata (user tags, custom titles).
 
-Each book in an OpenShelf library is uniquely identified by a `bookId`.
+* Dot-prefixed directories are **implementation-owned**; users should not manually edit.
 
-The `bookId` serves as the canonical identifier for:
-
-* Reading state files
-* Cross-device synchronization
-* Adapter operations
-* Library consistency checks
-
-The `bookId` namespace is global within a library.
-
----
-
-## 4.2 Normative Definition
-
-The derivation and validation of `bookId` values are defined by the:
-
-> **OpenShelf Book Identity Specification**
-
-Implementations **MUST** derive `bookId` values strictly according to that specification.
-
-Implementations **MUST NOT**:
-
-* Generate random identifiers
-* Use file paths as identifiers
-* Use adapter-defined identifiers
-* Derive identifiers using non-standard hashing methods
-
-Only identifiers produced according to the Book Identity Specification are valid.
-
----
-
-## 4.3 Identity Stability
-
-A book’s `bookId` **MUST** remain stable for the lifetime of that book within the library.
-
-Implementations:
-
-* **MUST NOT** regenerate a `bookId` unless the underlying identity truly changes.
-* **MUST** treat identical `bookId` values as referring to the same book.
-* **MUST NOT** assign multiple `bookId` values to the same canonical identity.
-
-If the canonical identity of a publication changes (e.g., different edition, modified content, or distinct logical source), a new `bookId` **MUST** be generated according to the Book Identity Specification.
-
----
-
-## 4.4 Reading State Association
-
-Reading state files located in `/.state/` **MUST** be associated with books using their `bookId`.
-
-The filename of a reading state file **MUST** correspond exactly to the associated `bookId`.
-
-Example:
-
-```
-.state/
-  9f2c1a...e4.json
-```
-
-Where `9f2c1a...e4` is a valid `bookId` derived according to the Book Identity Specification.
-
----
-
-## 4.5 Conformance
-
-An implementation is not compliant with the OpenShelf Core Specification if it derives, assigns, or interprets `bookId` values in a manner inconsistent with the OpenShelf Book Identity Specification.
+* Purpose of folders is briefly explained; full details and normative behavior are in separate specifications.
 
 ---
 
 ## 5. Reading State File Format
 
-* A reading state file **MUST** conform to the **OpenShelf Reading State Format Specification**.
-* The version of the format used **MUST** be compatible with the `spec.version` declared in `library.json`.
+* References **OpenShelf Reading State Format Specification**.
+* Core spec only gives a brief overview: each reading state file is tied to a `bookId` and stored under `/.state/`.
 
 ---
 
 ## 6. Conflict Resolution
 
-When multiple reading state updates conflict:
-
-* Implementations **MUST** select the state with the latest `updatedAt` timestamp.
-* Timestamps **MUST** be compared as UTC.
-* If timestamps are equal, behavior is implementation-defined.
+* If multiple updates conflict: use **latest `updatedAt` timestamp**.
+* Timestamps must be compared in UTC.
+* Equal timestamps: behavior is implementation-defined.
 
 ---
 
 ## 7. Capability Declaration
 
-Declared capabilities describe the features supported by the library format itself, not by any specific reader or adapter.
-
-* Implementations **MUST** ignore unknown capabilities
-* The library **MUST** declare supported capabilities in `library.json`:
+* Libraries declare their supported capabilities in `library.json`.
+* Unknown capabilities must be ignored.
+* Example snippet:
 
 ```json
 {
@@ -147,51 +76,33 @@ Declared capabilities describe the features supported by the library format itse
     "name": "OpenShelf",
     "version": "0.2.0-draft"
   },
-  "capabilities": [
-    "location"
-  ]
+  "capabilities": ["location"]
 }
 ```
-
-### Required fields
-
-* `spec`
-* `spec.name`
-* `spec.version`
-* `capabilities`
 
 ---
 
 ## 8. Forward Compatibility
 
-* Implementations **MUST** ignore unknown fields in all OpenShelf-defined files.
-* Future versions of this specification **MAY** introduce additional fields or capabilities.
+* Unknown fields **MUST** be ignored.
+* Future versions may introduce additional fields or capabilities.
 
 ---
 
 ## 9. Non-Goals
 
-This version does **not** define:
+* Core spec does **not** define:
 
-* Annotations
-* Highlights
-* Bookmarks
-* Metadata indexing
-* Sync protocols
-* Server APIs
-* Multi-user libraries
+  * Annotations, highlights, bookmarks
+  * Metadata indexing beyond minimal structure
+  * Sync protocols, server APIs
+  * Multi-user libraries
 
 ---
 
 ## 10. Related Specifications
 
-The following specifications extend OpenShelf:
-
-* **OpenShelf Reading State Format Specification** — defines the structure and naming of reading state files.
-* **OpenShelf Neutral Reading State Model Specification** — defines the conceptual in-memory model and merge semantics.
-* **OpenShelf Adapter Responsibility Levels Specification** — defines behavioral requirements for adapters interacting with an OpenShelf library.
-* **OpenShelf Book Identity Specification** — defines the derivation, validation, and stability requirements of `bookId` values.
-
-These documents define normative extensions to the OpenShelf Core Specification.
-
-Implementations claiming conformance to OpenShelf **MUST** comply with all referenced specifications applicable to the features they implement.
+* **OpenShelf Reading State Format Specification** — reading state file structure.
+* **OpenShelf Neutral Reading State Model Specification** — conceptual in-memory model, merge semantics.
+* **OpenShelf Adapter Responsibility Levels Specification** — adapter behavior requirements.
+* **OpenShelf Book Identity Specification** — derivation, validation, and stability of `bookId` values.

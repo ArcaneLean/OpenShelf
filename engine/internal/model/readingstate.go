@@ -1,6 +1,8 @@
 package model
 
 import (
+	"encoding/json"
+	"os"
 	"time"
 )
 
@@ -53,4 +55,24 @@ func (rs *ReadingState) SetLocation(locType string, value any, t time.Time) {
 func IsInteroperable(locType string) bool {
 	_, ok := interoperableLocationTypes[locType]
 	return ok
+}
+
+func LoadReadingState(path string) (*ReadingState, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var state ReadingState
+	if err := json.Unmarshal(data, &state); err != nil {
+		return nil, err
+	}
+	return &state, nil
+}
+
+func SaveReadingState(path string, state *ReadingState) error {
+	data, err := json.MarshalIndent(state, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, os.ModePerm)
 }
