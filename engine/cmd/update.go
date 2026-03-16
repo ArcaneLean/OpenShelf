@@ -16,7 +16,7 @@ var timeFlag string
 
 // updateCmd represents the update command
 var updateCmd = &cobra.Command{
-	Use:   "update <path-to-state-file> <location-type> <value>",
+	Use:   "update <book-file|book-id> <location-type> <value>",
 	Short: "Update a location in a reading state file",
 	Long: `Update the reading state of a book.
 
