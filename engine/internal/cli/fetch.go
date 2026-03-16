@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/ArcaneLean/openshelf/internal/identity"
+	"github.com/ArcaneLean/openshelf/internal/library"
 	"github.com/ArcaneLean/openshelf/internal/model"
-	"github.com/ArcaneLean/openshelf/internal/state"
 )
 
 func FetchState(bookOrFile string) (*model.ReadingState, error) {
@@ -25,10 +25,12 @@ func FetchState(bookOrFile string) (*model.ReadingState, error) {
 		bookID = bookOrFile
 	}
 
-	rsPath, err := state.GetStatePath(bookID)
-	// handle error
+	lib, err := library.Resolve()
+	if err != nil {
+		return nil, err
+	}
 
-	rs, err := state.LoadReadingState(rsPath)
+	rs, err := model.LoadReadingState(lib.StatePath(bookID))
 	if err != nil {
 		return nil, fmt.Errorf("reading state not found for bookID %s: %w", bookID, err)
 	}

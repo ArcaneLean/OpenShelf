@@ -5,6 +5,7 @@ package identity
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"os"
 
@@ -27,10 +28,12 @@ func GetBookID(path string) (string, error) {
 	metaPath := lib.MetadataPath(hash)
 	meta, err := metadata.LoadMetadata(metaPath)
 	if err != nil {
-		return "", err
+		// Cache miss — EPUB extraction not yet implemented.
+		// User must register the book manually.
+		return "", fmt.Errorf("no metadata found for this file; run 'openshelf register' to add it")
 	}
-	// Metadata file -> canonical file
-	// Canonical file -> BookID
+
+	return meta.BookID, nil
 }
 
 func ComputeBookID(path string) (string, error) {

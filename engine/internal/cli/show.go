@@ -8,13 +8,13 @@ import (
 	"io"
 	"time"
 
-	"github.com/ArcaneLean/openshelf/internal/state"
+	"github.com/ArcaneLean/openshelf/internal/model"
 )
 
 // ShowState prints reading state info with optional flags.
 // If no flags are given, all sections are printed.
 func ShowState(w io.Writer, path string, bookOnly, latestOnly bool, locationType string) error {
-	rs, err := state.LoadReadingState(path)
+	rs, err := model.LoadReadingState(path)
 	if err != nil {
 		return fmt.Errorf("error loading reading state: %w", err)
 	}
