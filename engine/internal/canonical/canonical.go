@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"sort"
 	"strings"
+
+	"github.com/ArcaneLean/openshelf/internal/metadata"
 )
 
 type Canonical struct {
@@ -19,6 +21,19 @@ type Canonical struct {
 	Publisher     string            `json:"publisher,omitempty"`
 	PublishedYear int               `json:"publishedYear,omitempty"`
 	Identifiers   map[string]string `json:"identifiers,omitempty"`
+}
+
+// FromMetadata builds a Canonical from mutable metadata.
+// This should be called once at registration time; the result is immutable.
+func FromMetadata(m *metadata.Metadata) *Canonical {
+	return &Canonical{
+		Title:         m.Title,
+		Authors:       append([]string(nil), m.Authors...),
+		Language:      m.Language,
+		Publisher:     m.Publisher,
+		PublishedYear: m.PublishedYear,
+		Identifiers:   m.Identifiers,
+	}
 }
 
 // Normalize ensures canonical identity stability.
