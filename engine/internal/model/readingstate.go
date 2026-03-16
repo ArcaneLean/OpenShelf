@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const SpecVersion = "0.2.0-draft"
+
 var interoperableLocationTypes = map[string]struct{}{
 	"percentage":  {},
 	"epubcfi":     {},
@@ -25,6 +27,15 @@ type ReadingState struct {
 	BookID      string              `json:"bookId"`
 	UpdatedAt   time.Time           `json:"updatedAt"`
 	Locations   map[string]Location `json:"location"`
+}
+
+func NewReadingState(bookID string) *ReadingState {
+	return &ReadingState{
+		SpecVersion: SpecVersion,
+		BookID:      bookID,
+		UpdatedAt:   time.Now().UTC(),
+		Locations:   make(map[string]Location),
+	}
 }
 
 func (rs *ReadingState) MostRecentLocation() (string, Location, bool) {

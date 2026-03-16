@@ -5,6 +5,7 @@ package cli
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/ArcaneLean/openshelf/internal/identity"
 	"github.com/ArcaneLean/openshelf/internal/library"
@@ -30,9 +31,20 @@ func FetchState(bookOrFile string) (*model.ReadingState, error) {
 		return nil, err
 	}
 
-	rs, err := model.LoadReadingState(lib.StatePath(bookID))
-	if err != nil {
-		return nil, fmt.Errorf("reading state not found for bookID %s: %w", bookID, err)
+	statePath := lib.StatePath(bookID)
+	rs, err := model.LoadReadingState(statePath)
+	if os.IsNotExist(err) {
+		// First open — create and persist a new empty state.
+		rs = model.NewReadingState(bookID)
+		if err := os.MkdirAll(filepath.Dir(statePath), 0755); err != nil {
+			return nil, fmt.Errorf("cannot create state directory: %w", err)
+		}
+		if err := model.SaveReadingState(statePath, rs); err != nil {
+			return nil, fmt.Errorf("cannot save new reading state: %w", err)
+		}
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to load reading state for bookID %s: %w", bookID, err)
 	}
+
 	return rs, nil
 }
