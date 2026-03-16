@@ -1,3 +1,5 @@
+// Copyright (C) 2026 Aron Davids
+// SPDX-License-Identifier: GPL-3.0-or-later
 package merge
 
 import (

@@ -1,6 +1,5 @@
-/*
-Copyright © 2026 Aron Davids a.davids.mail@proton.me
-*/
+// Copyright (C) 2026 Aron Davids
+// SPDX-License-Identifier: GPL-3.0-or-later
 package cmd
 
 import (
