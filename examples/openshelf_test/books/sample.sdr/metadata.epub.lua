@@ -1,4 +1,4 @@
--- /home/arcanelean/Documents/Programming/OpenShelf/examples/openshelf_test/books/sample.sdr/metadata.epub.lua
+-- /path/to/your/OpenShelf/examples/openshelf_test/books/sample.sdr/metadata.epub.lua
 return {
     ["annotations"] = {},
     ["config_panel_index"] = 1,
@@ -34,7 +34,7 @@ return {
     ["cre_dom_version"] = 20240114,
     ["css"] = "./data/epub.css",
     ["doc_pages"] = 1,
-    ["doc_path"] = "/home/arcanelean/Documents/Programming/OpenShelf/examples/openshelf_test/books/sample.epub",
+    ["doc_path"] = "/path/to/your/OpenShelf/examples/openshelf_test/books/sample.epub",
     ["doc_props"] = {
         ["identifiers"] = "sample-epub-001",
         ["language"] = "en",

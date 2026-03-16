@@ -2,7 +2,7 @@ local json = require("json")
 local utils = require("utils")
 local hash = require("hash")
 
-local library_path = "/home/arcanelean/Documents/Programming/OpenShelf/examples/openshelf_test/"
+local library_path = os.getenv("OPENSHELF_LIBRARY_PATH") or "/path/to/your/openshelf_library/"
 
 local library = {}
 
